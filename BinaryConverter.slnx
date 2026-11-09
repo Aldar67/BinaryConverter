@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BinaryConverter/BinaryConverter.Client/BinaryConverter.Client.csproj" />
+  <Project Path="BinaryConverter/BinaryConverter/BinaryConverter.csproj" />
+</Solution>
