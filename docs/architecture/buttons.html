@@ -1,0 +1,520 @@
+<title>Маршруты кнопок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Слева макет кнопок сайта, справа «дорожки» Браузер · Сервер · Ядро, по которым идёт нажатие.
+   Цвет дорожки один и тот же на схеме, в шагах маршрута и в таблице. */
+:root {
+  --bg: #eef1f7;
+  --surface: #ffffff;
+  --ink: #131a2f;
+  --muted: #5c6580;
+  --line: #d6dbe7;
+  --board: #121a3c;
+  --chalk: #f3f1ea;
+  --amber: #ffc23d;
+  --amber-ink: #1d1500;
+  --browser: #2a74d0;
+  --web: #7353e8;
+  --core: #b97700;
+  --browser-soft: #e6f0fc;
+  --web-soft: #efeafd;
+  --core-soft: #fdf3dc;
+  --code-bg: #f4f6fb;
+  --t-local: #5f6b8a;
+  --t-get: #0e8a6f;
+  --t-post: #c2417a;
+  --badge-ink: #ffffff;
+  --font-display: "Unbounded", "Segoe UI", Arial, sans-serif;
+  --font-body: "Golos Text", "Segoe UI", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0d18; --surface: #131829; --ink: #e7eaf4; --muted: #929bb8; --line: #262d47;
+    --board: #0f1636; --browser: #6aa8ff; --web: #a891ff; --core: #ffc23d;
+    --browser-soft: #14243f; --web-soft: #1f1a3f; --core-soft: #2e2510; --code-bg: #0e1222;
+    --t-local: #9aa6c6; --t-get: #4fd3b0; --t-post: #ff7fb4; --badge-ink: #0a0d18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a0d18; --surface: #131829; --ink: #e7eaf4; --muted: #929bb8; --line: #262d47;
+  --board: #0f1636; --browser: #6aa8ff; --web: #a891ff; --core: #ffc23d;
+  --browser-soft: #14243f; --web-soft: #1f1a3f; --core-soft: #2e2510; --code-bg: #0e1222;
+  --t-local: #9aa6c6; --t-get: #4fd3b0; --t-post: #ff7fb4; --badge-ink: #0a0d18;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font-body); }
+.page { max-width: 1240px; margin: 0 auto; padding: 40px 20px 72px; display: flex; flex-direction: column; gap: 56px; }
+
+.eyebrow { margin: 0 0 12px; font: 500 12px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 52px)/1.05 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
+.lead { margin: 16px 0 0; max-width: 62ch; font-size: 18px; color: var(--muted); }
+h2 { margin: 0 0 20px; font: 600 clamp(20px, 2.6vw, 26px)/1.2 var(--font-display); letter-spacing: -.01em; }
+code, .mono { font-family: var(--font-mono); }
+
+/* ── Схема трёх частей ── */
+.arch { margin: 0; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow-x: auto; }
+.arch svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.arch figcaption { margin-top: 14px; color: var(--muted); font-size: 15px; }
+svg text { font-family: var(--font-body); fill: var(--ink); }
+svg .t-title { font: 600 19px var(--font-display); }
+svg .t-file { font: 500 14px var(--font-mono); }
+svg .t-note { font-size: 14px; fill: var(--muted); }
+svg .t-edge { font: 500 13px var(--font-mono); }
+svg .b-browser { fill: var(--browser-soft); stroke: var(--browser); stroke-width: 2.5; }
+svg .b-web { fill: var(--web-soft); stroke: var(--web); stroke-width: 2.5; }
+svg .b-core { fill: var(--core-soft); stroke: var(--core); stroke-width: 2.5; }
+svg .b-tests { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 6; }
+svg .edge { stroke: var(--ink); stroke-width: 2; fill: none; }
+svg .c-browser { fill: var(--browser); } svg .c-web { fill: var(--web); } svg .c-core { fill: var(--core); }
+
+/* ── Три типа кнопок ── */
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.type { padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; border-top: 5px solid var(--tc); }
+.type h3 { margin: 10px 0 6px; font: 600 18px var(--font-display); }
+.type p { margin: 0; color: var(--muted); font-size: 15px; }
+.type .path { margin-top: 14px; padding: 10px 12px; background: var(--code-bg); border-radius: 10px; font: 500 13px/1.6 var(--font-mono); color: var(--ink); }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font: 700 12px var(--font-mono); letter-spacing: .04em; color: var(--badge-ink); background: var(--tc); white-space: nowrap; }
+[data-type="local"] { --tc: var(--t-local); }
+[data-type="get"] { --tc: var(--t-get); }
+[data-type="post"] { --tc: var(--t-post); }
+
+/* ── Исследователь: макет + маршрут ── */
+.explorer { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+.mock { position: sticky; top: 16px; padding: 22px; border-radius: 22px; background: var(--board); color: var(--chalk); display: flex; flex-direction: column; gap: 22px; }
+.mock h3 { margin: 0 0 10px; font: 500 12px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #97a2c7; }
+.mock .group { display: flex; flex-wrap: wrap; gap: 8px; }
+.mock button {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 11px; border: 1.5px solid rgba(214,223,255,.22);
+  background: rgba(214,223,255,.06); color: var(--chalk); cursor: pointer;
+  font: 500 14px var(--font-body); text-align: left;
+  transition: background-color .15s, border-color .15s, transform .15s;
+}
+.mock button::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--tc); flex: none; }
+.mock button:hover { border-color: var(--tc); transform: translateY(-1px); }
+.mock button[aria-pressed="true"] { background: var(--amber); border-color: var(--amber); color: var(--amber-ink); }
+.mock button[aria-pressed="true"]::before { background: var(--amber-ink); }
+.mock button[data-type="local"] { --tc: #9aa6c6; }
+.mock button[data-type="get"] { --tc: #4fd3b0; }
+.mock button[data-type="post"] { --tc: #ff7fb4; }
+.mock .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-top: 16px; border-top: 1px solid rgba(214,223,255,.15); font: 500 12px var(--font-mono); color: #97a2c7; }
+.mock .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--tc); }
+.mock .legend [data-type="local"] { --tc: #9aa6c6; } .mock .legend [data-type="get"] { --tc: #4fd3b0; } .mock .legend [data-type="post"] { --tc: #ff7fb4; }
+
+.route { min-width: 0; padding: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; }
+.route-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.route-head h3 { margin: 0; font: 700 24px var(--font-display); letter-spacing: -.01em; }
+.route-sum { margin: 10px 0 22px; color: var(--muted); max-width: 70ch; }
+
+.lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 14px; row-gap: 12px; position: relative; }
+.lane-head { padding: 8px 12px; border-radius: 10px; font: 700 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; text-align: center; color: var(--lc); background: var(--ls); }
+.lane-browser { --lc: var(--browser); --ls: var(--browser-soft); }
+.lane-web { --lc: var(--web); --ls: var(--web-soft); }
+.lane-core { --lc: var(--core); --ls: var(--core-soft); }
+.lane-bg { grid-row: 1 / -1; border-radius: 12px; background: var(--ls); opacity: .45; z-index: 0; }
+
+.step { position: relative; z-index: 1; padding: 12px 14px 14px; border-radius: 14px; background: var(--surface); border: 2px solid var(--lc); animation: in .35s both; min-width: 0; }
+.step .hop { display: block; margin: -2px 0 8px; font: 700 12px var(--font-mono); color: var(--lc); overflow-wrap: anywhere; }
+.step .n { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 8px; border-radius: 50%; background: var(--lc); color: var(--surface); font: 700 12px var(--font-mono); vertical-align: 2px; }
+.step b { font-weight: 600; }
+.step code { display: block; margin-top: 8px; padding: 6px 8px; border-radius: 8px; background: var(--code-bg); font-size: 13px; overflow-wrap: anywhere; }
+.step p { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+.step .tag { display: none; }
+
+.io { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.io div { min-width: 0; }
+.io h4 { margin: 0 0 6px; font: 500 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.io pre { margin: 0; padding: 14px; border-radius: 12px; background: var(--code-bg); border: 1px solid var(--line); font: 13px/1.55 var(--font-mono); overflow-x: auto; white-space: pre; }
+
+/* ── Таблица ── */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+table { width: 100%; border-collapse: collapse; min-width: 820px; }
+th, td { padding: 12px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); font-size: 15px; }
+th { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td code { font-size: 13.5px; }
+td.group-row { background: var(--code-bg); font: 600 14px var(--font-display); }
+tbody tr[data-id] { cursor: pointer; }
+tbody tr[data-id]:hover td { background: var(--code-bg); }
+
+.foot { color: var(--muted); font-size: 14px; }
+
+@keyframes in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+@media (max-width: 900px) {
+  .explorer { grid-template-columns: 1fr; }
+  .mock { position: static; }
+  .types { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .lanes { grid-template-columns: 1fr; }
+  .lane-head, .lane-bg { display: none; }
+  .step { grid-column: 1 !important; grid-row: auto !important; }
+  .step .tag { display: inline-block; margin-left: 6px; font: 700 11px var(--font-mono); color: var(--lc); text-transform: uppercase; }
+  .io { grid-template-columns: 1fr; }
+  .route { padding: 18px; }
+}
+</style>
+
+<main class="page">
+  <header>
+    <p class="eyebrow">Системы счисления · C# · ASP.NET Core</p>
+    <h1>Куда уходит нажатие кнопки</h1>
+    <p class="lead">Сайт состоит из трёх частей. Каждая кнопка либо меняет картинку прямо в браузере, либо отправляет запрос на сервер, а сервер зовёт ядро, где живёт вся математика.</p>
+  </header>
+
+  <section>
+    <h2>Три части сайта</h2>
+    <figure class="arch">
+      <svg viewBox="0 0 1000 340" role="img" aria-label="Браузер отправляет запрос серверу, сервер вызывает ядро, ядро возвращает Result, сервер отвечает браузеру JSON">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="c-ink" style="fill: currentColor"/>
+          </marker>
+        </defs>
+
+        <rect class="b-browser" x="0" y="20" width="290" height="230" rx="16"/>
+        <text class="t-title" x="22" y="58">Браузер</text>
+        <text class="t-note" x="22" y="82">что видит ученик</text>
+        <text class="t-file" x="22" y="124">index.html — разметка</text>
+        <text class="t-file" x="22" y="152">styles.css — внешний вид</text>
+        <text class="t-file" x="22" y="180">app.js — кнопки, анимации</text>
+        <text class="t-note" x="22" y="222">ничего не вычисляет</text>
+
+        <rect class="b-web" x="355" y="20" width="290" height="230" rx="16"/>
+        <text class="t-title" x="377" y="58">Сервер</text>
+        <text class="t-note" x="377" y="82">NumberSystems.Web</text>
+        <text class="t-file" x="377" y="124">Program.cs — запуск</text>
+        <text class="t-file" x="377" y="152">ConversionEndpoints</text>
+        <text class="t-file" x="377" y="180">4 адреса /api/…</text>
+        <text class="t-note" x="377" y="222">передаёт, но не считает</text>
+
+        <rect class="b-core" x="710" y="20" width="290" height="230" rx="16"/>
+        <text class="t-title" x="732" y="58">Ядро</text>
+        <text class="t-note" x="732" y="82">NumberSystems.Core</text>
+        <text class="t-file" x="732" y="124">PositionalExpansion b→10</text>
+        <text class="t-file" x="732" y="152">DivisionChain 10→b</text>
+        <text class="t-file" x="732" y="180">AnswerChecker проверка</text>
+        <text class="t-file" x="732" y="208">ExerciseGenerator случайные</text>
+
+        <g style="color: var(--ink)">
+          <line class="edge" x1="292" y1="105" x2="351" y2="105" marker-end="url(#ah)"/>
+          <line class="edge" x1="353" y1="165" x2="294" y2="165" marker-end="url(#ah)"/>
+          <line class="edge" x1="647" y1="105" x2="706" y2="105" marker-end="url(#ah)"/>
+          <line class="edge" x1="708" y1="165" x2="649" y2="165" marker-end="url(#ah)"/>
+        </g>
+        <text class="t-edge" x="322" y="96" text-anchor="middle">GET/POST</text>
+        <text class="t-edge" x="322" y="186" text-anchor="middle">JSON</text>
+        <text class="t-edge" x="677" y="96" text-anchor="middle">вызов</text>
+        <text class="t-edge" x="677" y="186" text-anchor="middle">Result</text>
+
+        <rect class="b-tests" x="355" y="280" width="645" height="50" rx="12"/>
+        <text class="t-file" x="377" y="311">Тесты xUnit · 59 шт. — проверяют ядро и адреса сервера</text>
+      </svg>
+      <figcaption>Запрос всегда идёт слева направо, ответ возвращается справа налево. 200 — успех, 400 — ошибка ввода.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Три типа кнопок</h2>
+    <div class="types">
+      <article class="type" data-type="local">
+        <span class="badge">БРАУЗЕР</span>
+        <h3>Только картинка</h3>
+        <p>Данные уже есть в браузере. Меняется только то, что видно на экране.</p>
+        <div class="path">кнопка → функция app.js → экран</div>
+      </article>
+      <article class="type" data-type="get">
+        <span class="badge">GET</span>
+        <h3>«Построить»</h3>
+        <p>Браузер просит у сервера решение по шагам и рисует его на доске.</p>
+        <div class="path">app.js → GET /api/… → Endpoints → Core → JSON → доска</div>
+      </article>
+      <article class="type" data-type="post">
+        <span class="badge">POST</span>
+        <h3>«Проверить»</h3>
+        <p>Браузер отправляет ответ ученика, сервер пересчитывает и говорит, верно или нет.</p>
+        <div class="path">app.js → POST /api/check → AnswerChecker → correct/hint</div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Нажмите любую кнопку</h2>
+    <div class="explorer">
+      <div class="mock" id="mock" aria-label="Макет кнопок сайта"></div>
+      <div class="route" id="route" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Все кнопки одной таблицей</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Кнопка</th><th>Тип</th><th>Функция в app.js</th><th>Запрос</th><th>Что работает на сервере</th></tr></thead>
+        <tbody id="table"></tbody>
+      </table>
+    </div>
+    <p class="foot">Строка таблицы тоже кликабельна: она открывает маршрут кнопки выше.</p>
+  </section>
+</main>
+
+<script>
+const LANES = { browser: 'Браузер · app.js', web: 'Сервер · Endpoints', core: 'Ядро · Core' };
+const ORDER = ['browser', 'web', 'core'];
+const TYPE = { local: 'БРАУЗЕР', get: 'GET', post: 'POST' };
+
+const B = (title, code, note, hop) => ({ lane: 'browser', title, code, note, hop });
+const W = (title, code, note, hop) => ({ lane: 'web', title, code, note, hop });
+const C = (title, code, note, hop) => ({ lane: 'core', title, code, note, hop });
+
+const BUTTONS = [
+  { group: 'Шапка', id: 'tab', label: 'b → 10 / 10 → b', type: 'local', func: 'switchTab()', req: '—', server: '—',
+    sum: 'Переключение вкладок. Одна вкладка прячется, другая показывается. Обе задачи загружены ещё при открытии страницы.',
+    steps: [B('Нажата вкладка', 'switchTab(name)', 'ставит aria-selected на кнопку и hidden на чужую панель')] },
+
+  { group: 'Задача «b → 10»', id: 'to-build', label: 'Построить / кнопка основания', type: 'get', func: 'loadTo()', req: 'GET /api/to-decimal', server: 'PositionalExpansion.ToDecimal',
+    sum: 'Сервер раскладывает число по разрядам и возвращает все шаги. Браузер рисует карточки, веса и «?».',
+    steps: [
+      B('Чтение условия', 'loadTo()', 'берёт число «1A3» и выбранное основание 16'),
+      W('Адрес /to-decimal', 'MapGet("/to-decimal", …)', 'достаёт number и radix из адреса', '→ HTTP GET'),
+      C('Разрядное разложение', 'PositionalExpansion.ToDecimal("1A3", 16)', 'проверяет цифры, для каждого разряда считает вес, вклад и сумму', '→ вызов метода'),
+      W('Упаковка ответа', 'ToHttp(result)', 'успех → код 200 и JSON', '← Result'),
+      B('Рисование доски', 'renderTo(data)', 'карточки цифр, веса 16², 16¹, 16⁰, плашки «?», пустой сумматор', '← JSON 200'),
+    ],
+    request: 'GET /api/to-decimal?number=1A3&radix=16',
+    response: '200 OK\n{\n  "digits": "1A3", "radix": 16, "value": 419,\n  "terms": [\n    { "position": 2, "symbol": "1", "weight": 256,\n      "contribution": 256, "runningSum": 256 },\n    { "position": 1, "symbol": "A", "weight": 16,\n      "contribution": 160, "runningSum": 416 },\n    …\n  ]\n}' },
+
+  { group: 'Задача «b → 10»', id: 'to-random', label: 'Случайное число', type: 'get', func: 'loadRandom()', req: 'GET /api/exercise → GET /api/to-decimal', server: 'ExerciseGenerator.Next',
+    sum: 'Два запроса подряд: сначала сервер придумывает число и основание, потом всё идёт как при «Построить».',
+    steps: [
+      B('Запрос задачи', "loadRandom('to', 'ToDecimal')", ''),
+      W('Адрес /exercise', 'MapGet("/exercise", …)', 'генератор приходит через внедрение зависимостей', '→ HTTP GET'),
+      C('Случайная задача', 'ExerciseGenerator.Next()', 'основание 2–16 кроме 10, число до 1023, иногда 0', '→ вызов метода'),
+      B('Подстановка в панель', 'loadTo()', 'вписывает число и основание, затем маршрут «Построить»', '← JSON 200'),
+    ],
+    request: 'GET /api/exercise?direction=ToDecimal',
+    response: '200 OK\n{ "direction": "ToDecimal", "number": "1011", "radix": 2 }' },
+
+  { group: 'Задача «b → 10»', id: 'to-card', label: 'Карточка цифры', type: 'local', func: 'selectTerm()', req: '—', server: '—',
+    sum: 'Выбор разряда, для которого ученик будет искать вклад. Сервер не нужен.',
+    steps: [B('Выбран разряд', 'selectTerm(position)', 'жёлтая рамка вокруг карточки, в панели задание «A · 16¹ = ?»')] },
+
+  { group: 'Задача «b → 10»', id: 'to-check', label: 'Проверить (вклад)', type: 'post', func: 'answerContribution()', req: 'POST /api/check · DigitContribution', server: 'AnswerChecker → PositionalExpansion',
+    sum: 'Ответ ученика уходит на сервер. Сервер заново раскладывает число и сравнивает вклад нужного разряда.',
+    steps: [
+      B('Ответ ученика', 'answerContribution(false)', 'берёт введённое «160»'),
+      W('Адрес /check', 'MapPost("/check", …)', 'тело запроса превращается в CheckRequest', '→ HTTP POST'),
+      C('Проверка вклада', 'AnswerChecker.CheckContribution', 'заново ToDecimal, берёт разряд 1, сравнивает 160 = 160', '→ вызов метода'),
+      W('Упаковка ответа', 'ToHttp(result)', 'correct, hint, explanation', '← Result'),
+      B('Реакция', 'revealContribution()', 'верно: вклад на карточке, через 1 с следующий разряд. Неверно: подсказка и тряска поля', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "DigitContribution", "number": "1A3",\n  "radix": 16, "index": 1, "answer": "160" }',
+    response: '200 OK\n{ "correct": true, "expected": "160",\n  "hint": "Вклад = значение цифры × основание…",\n  "explanation": "A · 16¹ = 10 · 16 = 160" }' },
+
+  { group: 'Задача «b → 10»', id: 'to-show', label: 'Показать решение', type: 'post', func: 'answerContribution(true)', req: 'POST /api/check · пустой ответ', server: 'AnswerChecker',
+    sum: 'Тот же запрос, что и «Проверить», но с пустым ответом: сервер возвращает правильный ответ и объяснение.',
+    steps: [
+      B('Пустой ответ', 'answerContribution(true)', ''),
+      W('Адрес /check', 'MapPost("/check", …)', '', '→ HTTP POST'),
+      C('Проверка', 'AnswerChecker.Check', 'correct = false, но в expected и explanation есть решение', '→ вызов метода'),
+      B('Показ решения', 'revealContribution()', 'вклад открыт, разряд в прогрессе серый, а не зелёный', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "DigitContribution", …, "answer": "" }',
+    response: '200 OK\n{ "correct": false, "expected": "160", … }' },
+
+  { group: 'Задача «b → 10»', id: 'to-sum', label: 'Сложить вклады', type: 'local', func: 'sumContributions()', req: '—', server: '—',
+    sum: 'Сервер не нужен: все вклады и накопленные суммы уже пришли при «Построить». Браузер только анимирует.',
+    steps: [
+      B('Цикл по разрядам', 'sumContributions()', 'для каждого DigitTerm по очереди'),
+      B('Отрезок сумматора', 'seg.style.width', 'ширина = вклад / число, цвет как у карточки'),
+      B('Счётчик', 'countTo(prev, runningSum)', '256 → 416 → 419, в конце «1A3₁₆ = 419₁₀»'),
+    ] },
+
+  { group: 'Задача «10 → b»', id: 'from-build', label: 'Построить / кнопка основания', type: 'get', func: 'loadFrom()', req: 'GET /api/from-decimal', server: 'DivisionChain.FromDecimal',
+    sum: 'Сервер выполняет всю цепочку делений. Браузер показывает её по одной ступеньке.',
+    steps: [
+      B('Чтение условия', 'loadFrom()', 'число 419, основание 16'),
+      W('Адрес /from-decimal', 'MapGet("/from-decimal", …)', '', '→ HTTP GET'),
+      C('Проверка числа', 'PositionalExpansion.ToDecimal(input, 10)', 'тот же валидатор с основанием 10: «-5», «12a», «5000» → ошибка', '→ вызов метода'),
+      C('Цепочка делений', 'DivisionChain: do … while (n > 0)', 'делит, пока частное не 0; остатки в обратном порядке → «1A3»'),
+      W('Упаковка ответа', 'ToHttp(result)', '', '← Result'),
+      B('Рисование уголка', 'renderFrom() → drawLadder()', 'первая ступенька 419 | 16 и кружок «?»', '← JSON 200'),
+    ],
+    request: 'GET /api/from-decimal?number=419&radix=16',
+    response: '200 OK\n{\n  "value": 419, "radix": 16, "digits": "1A3",\n  "steps": [\n    { "dividend": 419, "quotient": 26, "remainder": 3 },\n    { "dividend": 26,  "quotient": 1,  "remainder": 10,\n      "remainderSymbol": "A" },\n    { "dividend": 1,   "quotient": 0,  "remainder": 1 }\n  ]\n}' },
+
+  { group: 'Задача «10 → b»', id: 'from-random', label: 'Случайное число', type: 'get', func: 'loadRandom()', req: 'GET /api/exercise → GET /api/from-decimal', server: 'ExerciseGenerator.Next',
+    sum: 'Как в первой задаче: сервер придумывает число, потом маршрут «Построить».',
+    steps: [
+      B('Запрос задачи', "loadRandom('from', 'FromDecimal')", ''),
+      W('Адрес /exercise', 'MapGet("/exercise", …)', '', '→ HTTP GET'),
+      C('Случайная задача', 'ExerciseGenerator.Next()', '', '→ вызов метода'),
+      B('Подстановка', 'loadFrom()', 'дальше как «Построить»', '← JSON 200'),
+    ],
+    request: 'GET /api/exercise?direction=FromDecimal',
+    response: '200 OK\n{ "direction": "FromDecimal", "number": "357", "radix": 8 }' },
+
+  { group: 'Задача «10 → b»', id: 'from-check', label: 'Проверить (остаток)', type: 'post', func: 'answerRemainder()', req: 'POST /api/check · NextRemainder', server: 'AnswerChecker → DivisionChain',
+    sum: 'Сервер заново делит и сравнивает остаток. Засчитывает и букву «A», и число «10».',
+    steps: [
+      B('Ответ ученика', 'answerRemainder(false)', 'остаток второго деления: «A»'),
+      W('Адрес /check', 'MapPost("/check", …)', '', '→ HTTP POST'),
+      C('Проверка остатка', 'AnswerChecker.CheckRemainder', 'заново FromDecimal, берёт деление 1, сравнивает символ или число', '→ вызов метода'),
+      B('Следующая ступенька', 'answered++ → drawLadder()', 'остаток в кружке, появляется следующее деление. После последнего — сборка записи', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "NextRemainder", "number": "419",\n  "radix": 16, "index": 1, "answer": "A" }',
+    response: '200 OK\n{ "correct": true, "expected": "A",\n  "explanation": "26 = 16 · 1 + 10, остаток 10\n                  записывается цифрой A" }' },
+
+  { group: 'Задача «10 → b»', id: 'from-show-rem', label: 'Показать решение', type: 'post', func: 'answerRemainder(true)', req: 'POST /api/check · пустой ответ', server: 'AnswerChecker',
+    sum: 'Тот же запрос с пустым ответом: сервер подсказывает остаток.',
+    steps: [
+      B('Пустой ответ', 'answerRemainder(true)', ''),
+      W('Адрес /check', 'MapPost("/check", …)', '', '→ HTTP POST'),
+      C('Проверка', 'AnswerChecker.CheckRemainder', '', '→ вызов метода'),
+      B('Показ', 'drawLadder()', 'остаток появляется в кружке', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "NextRemainder", …, "answer": "" }',
+    response: '200 OK\n{ "correct": false, "expected": "A", … }' },
+
+  { group: 'Задача «10 → b»', id: 'from-chip', label: 'Кружок-остаток', type: 'local', func: 'pickRemainder()', req: '—', server: '—',
+    sum: 'Сборка записи числа: остаток перелетает с доски в следующую свободную ячейку.',
+    steps: [
+      B('Выбран остаток', 'pickRemainder(i)', 'запоминает номер в списке picked, кружок бледнеет'),
+      B('Перелёт', 'fly(кружок, ячейка)', 'копия кружка анимацией летит в ячейку «Запись числа»'),
+    ] },
+
+  { group: 'Задача «10 → b»', id: 'from-order', label: 'Проверить (запись)', type: 'post', func: 'checkOrder()', req: 'POST /api/check · DigitOrder', server: 'AnswerChecker → DivisionChain',
+    sum: 'Собранная строка уходит на сервер. Сервер сравнивает её с правильной записью.',
+    steps: [
+      B('Сбор строки', 'checkOrder()', 'из ячеек получается «1A3»'),
+      W('Адрес /check', 'MapPost("/check", …)', '', '→ HTTP POST'),
+      C('Проверка порядка', 'AnswerChecker.CheckOrder', 'сравнивает с Digits = «1A3»', '→ вызов метода'),
+      B('Финал', 'finishFrom()', 'дуга «снизу вверх», номера цифр, ответ 419₁₀ = 1A3₁₆', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "DigitOrder", "number": "419",\n  "radix": 16, "index": 0, "answer": "1A3" }',
+    response: '200 OK\n{ "correct": true, "expected": "1A3",\n  "explanation": "Остатки по порядку получения: 3, A, 1.\n   Читаем их от последнего к первому…" }' },
+
+  { group: 'Задача «10 → b»', id: 'from-reset', label: 'Заново', type: 'local', func: 'resetAssembly()', req: '—', server: '—',
+    sum: 'Очищает ячейки записи и возвращает кружкам яркость.',
+    steps: [B('Сброс сборки', 'resetAssembly()', 'picked = [], ячейки пустые')] },
+
+  { group: 'Задача «10 → b»', id: 'from-show', label: 'Показать (запись)', type: 'post', func: 'showOrder()', req: 'POST /api/check · DigitOrder', server: 'AnswerChecker',
+    sum: 'Сначала браузер сам показывает сборку, затем спрашивает у сервера объяснение.',
+    steps: [
+      B('Стрелка', 'drawReadArrow()', 'дуга от последнего остатка к первому'),
+      B('Перелёты', 'pickRemainder(n-1 … 0)', 'остатки летят в ячейки от последнего к первому'),
+      W('Адрес /check', 'MapPost("/check", …)', 'пустой ответ — нужно только объяснение', '→ HTTP POST'),
+      C('Объяснение', 'AnswerChecker.CheckOrder', '', '→ вызов метода'),
+      B('Финал', 'finishFrom()', 'номера цифр и ответ', '← JSON 200'),
+    ],
+    request: 'POST /api/check\n{ "kind": "DigitOrder", …, "answer": "" }',
+    response: '200 OK\n{ "correct": false, "expected": "1A3", "explanation": "…" }' },
+
+  { group: 'Ошибка ввода', id: 'error', label: 'Построить с «1201» в двоичной', type: 'get', func: 'loadTo() → showError()', req: 'GET /api/to-decimal → 400', server: 'PositionalExpansion → Result.Fail',
+    sum: 'Ядро находит недопустимую цифру и возвращает ошибку с позицией. Сервер отвечает 400, браузер подсвечивает символ.',
+    steps: [
+      B('Чтение условия', 'loadTo()', 'число «1201», основание 2'),
+      W('Адрес /to-decimal', 'MapGet("/to-decimal", …)', '', '→ HTTP GET'),
+      C('Проверка цифр', 'PositionalExpansion.ToDecimal', '«2» ≥ основания 2 → Result.Fail(InvalidDigit, позиция 1)', '→ вызов метода'),
+      W('Ответ-ошибка', 'ToHttp(result)', 'ошибка → код 400 и описание', '← Result'),
+      B('Показ ошибки', 'api() бросает ошибку → showError()', 'текст ошибки, «1[2]01» с подсветкой, доска тускнеет', '← JSON 400'),
+    ],
+    request: 'GET /api/to-decimal?number=1201&radix=2',
+    response: '400 Bad Request\n{ "code": "InvalidDigit",\n  "message": "Символ «2» недопустим в системе\n              с основанием 2 (допустимы 0–1).",\n  "position": 1 }' },
+];
+
+const el = (tag, props = {}, ...kids) => { const n = document.createElement(tag); Object.assign(n, props); n.append(...kids); return n; };
+const badge = (type) => el('span', { className: 'badge', textContent: TYPE[type] });
+
+function renderMock() {
+  const mock = document.getElementById('mock');
+  const groups = [...new Set(BUTTONS.map((b) => b.group))];
+  for (const g of groups) {
+    const wrap = el('div', {}, el('h3', { textContent: g }));
+    const row = el('div', { className: 'group' });
+    for (const b of BUTTONS.filter((x) => x.group === g)) {
+      const btn = el('button', { type: 'button', textContent: b.label, id: `btn-${b.id}` });
+      btn.dataset.type = b.type;
+      btn.setAttribute('aria-pressed', 'false');
+      btn.addEventListener('click', () => select(b.id));
+      row.append(btn);
+    }
+    wrap.append(row);
+    mock.append(wrap);
+  }
+  const legend = el('div', { className: 'legend' });
+  for (const [type, text] of [['local', 'только браузер'], ['get', 'GET — построить'], ['post', 'POST — проверить']]) {
+    const s = el('span', { textContent: text });
+    s.dataset.type = type;
+    legend.append(s);
+  }
+  mock.append(legend);
+}
+
+function select(id) {
+  const b = BUTTONS.find((x) => x.id === id);
+  document.querySelectorAll('#mock button').forEach((n) => n.setAttribute('aria-pressed', String(n.id === `btn-${id}`)));
+
+  const route = document.getElementById('route');
+  const head = el('div', { className: 'route-head' }, el('h3', { textContent: `«${b.label}»` }));
+  const bd = badge(b.type); bd.dataset.type = b.type; head.append(bd);
+
+  const lanes = el('div', { className: 'lanes' });
+  ORDER.forEach((lane, i) => {
+    const bg = el('div', { className: `lane-bg lane-${lane}` }); bg.style.gridColumn = i + 1; lanes.append(bg);
+    const h = el('div', { className: `lane-head lane-${lane}`, textContent: LANES[lane] }); h.style.gridColumn = i + 1; h.style.gridRow = 1; lanes.append(h);
+  });
+  b.steps.forEach((s, i) => {
+    const card = el('div', { className: `step lane-${s.lane}` });
+    card.style.gridColumn = ORDER.indexOf(s.lane) + 1;
+    card.style.gridRow = i + 2;
+    card.style.animationDelay = `${i * 90}ms`;
+    if (s.hop) card.append(el('span', { className: 'hop', textContent: s.hop }));
+    card.append(el('span', { className: 'n', textContent: i + 1 }), el('b', { textContent: s.title }),
+      el('span', { className: 'tag', textContent: LANES[s.lane].split(' ·')[0] }));
+    if (s.code) card.append(el('code', { textContent: s.code }));
+    if (s.note) card.append(el('p', { textContent: s.note }));
+    lanes.append(card);
+  });
+
+  const parts = [head, el('p', { className: 'route-sum', textContent: b.sum }), lanes];
+  if (b.request) parts.push(el('div', { className: 'io' },
+    el('div', {}, el('h4', { textContent: 'Запрос' }), el('pre', { textContent: b.request })),
+    el('div', {}, el('h4', { textContent: 'Ответ сервера' }), el('pre', { textContent: b.response }))));
+  else parts.push(el('div', { className: 'io' }, el('div', {}, el('h4', { textContent: 'Запрос' }), el('pre', { textContent: 'Нет: сервер не участвует.' }))));
+  route.replaceChildren(...parts);
+}
+
+function renderTable() {
+  const body = document.getElementById('table');
+  let group = '';
+  for (const b of BUTTONS) {
+    if (b.group !== group) {
+      group = b.group;
+      body.append(el('tr', {}, el('td', { className: 'group-row', colSpan: 5, textContent: group })));
+    }
+    const bd = badge(b.type); bd.dataset.type = b.type;
+    const tr = el('tr', {},
+      el('td', { textContent: b.label }),
+      el('td', {}, bd),
+      el('td', {}, el('code', { textContent: b.func })),
+      el('td', {}, el('code', { textContent: b.req })),
+      el('td', {}, el('code', { textContent: b.server })));
+    tr.dataset.id = b.id;
+    tr.addEventListener('click', () => { select(b.id); document.getElementById('route').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    body.append(tr);
+  }
+}
+
+renderMock();
+renderTable();
+select('to-build');
+</script>

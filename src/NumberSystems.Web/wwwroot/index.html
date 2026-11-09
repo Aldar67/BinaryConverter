@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Системы счисления</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">b→10</span>
+      <span class="brand-name">Системы счисления</span>
+    </div>
+    <nav class="modes" role="tablist" aria-label="Тип задачи">
+      <button type="button" role="tab" data-tab="to" aria-selected="true"><b>b → 10</b><span>разложение</span></button>
+      <button type="button" role="tab" data-tab="from" aria-selected="false"><b>10 → b</b><span>деление</span></button>
+    </nav>
+    <span class="limits">основания 2–16 · числа 0–4095</span>
+  </header>
+
+  <!-- ───────── Задача 1: разрядное разложение ───────── -->
+  <section id="to" class="mode" role="tabpanel">
+    <div class="board" id="to-board">
+      <div class="board-head">
+        <span class="board-label">Разрядное разложение</span>
+        <p class="statement" id="to-statement"></p>
+      </div>
+
+      <div class="tiles" id="to-tiles"></div>
+
+      <div class="adder">
+        <div class="adder-top">
+          <span class="board-label">Сумма вкладов</span>
+          <output class="counter" id="to-counter">0</output>
+        </div>
+        <div class="bar" id="to-bar"></div>
+        <p class="formula" id="to-formula"></p>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <form id="to-form" class="card">
+        <h2>Условие</h2>
+        <label class="field-label" for="to-number">Число в системе с основанием <b id="to-radix-label">16</b></label>
+        <input id="to-number" class="big-input" value="1A3" maxlength="12" autocomplete="off" spellcheck="false">
+        <fieldset class="radix">
+          <legend class="field-label">Основание</legend>
+          <div class="chips" id="to-radix"></div>
+        </fieldset>
+        <div class="actions">
+          <button type="submit" class="primary">Построить</button>
+          <button type="button" id="to-random" class="ghost">Случайное число</button>
+        </div>
+        <p class="error" id="to-error" role="alert" hidden></p>
+      </form>
+
+      <section class="card">
+        <h2>Задание <span id="to-count">0 / 0</span></h2>
+        <ol class="progress" id="to-progress" aria-label="Разряды"></ol>
+        <p class="prompt-title" id="to-prompt-title"></p>
+        <p class="prompt-eq" id="to-prompt-eq"></p>
+        <form id="to-ask" class="answer-row">
+          <input id="to-ask-input" inputmode="numeric" autocomplete="off" aria-label="Вклад разряда">
+          <button type="submit" class="primary">Проверить</button>
+        </form>
+        <button type="button" id="to-ask-show" class="link">Показать решение</button>
+        <p class="feedback" id="to-feedback" aria-live="polite"></p>
+        <button type="button" id="to-sum" class="primary wide">Сложить вклады</button>
+      </section>
+    </aside>
+  </section>
+
+  <!-- ───────── Задача 2: деление с остатком ───────── -->
+  <section id="from" class="mode" role="tabpanel" hidden>
+    <div class="board" id="from-board">
+      <div class="board-head">
+        <span class="board-label">Деление уголком</span>
+        <p class="statement" id="from-statement"></p>
+      </div>
+
+      <div class="ladder-wrap">
+        <div class="ladder" id="from-ladder"></div>
+      </div>
+
+      <div class="record">
+        <span class="board-label">Запись числа</span>
+        <div class="slots" id="from-slots"></div>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <form id="from-form" class="card">
+        <h2>Условие</h2>
+        <label class="field-label" for="from-number">Десятичное число от 0 до 4095</label>
+        <input id="from-number" class="big-input" value="419" maxlength="4" inputmode="numeric" autocomplete="off">
+        <fieldset class="radix">
+          <legend class="field-label">Перевести в систему с основанием</legend>
+          <div class="chips" id="from-radix"></div>
+        </fieldset>
+        <div class="actions">
+          <button type="submit" class="primary">Построить</button>
+          <button type="button" id="from-random" class="ghost">Случайное число</button>
+        </div>
+        <p class="error" id="from-error" role="alert" hidden></p>
+      </form>
+
+      <section class="card">
+        <h2>Задание <span id="from-count">0 / 0</span></h2>
+        <ol class="progress" id="from-progress" aria-label="Деления"></ol>
+
+        <div id="from-ask">
+          <p class="prompt-title" id="from-prompt-title"></p>
+          <p class="prompt-eq" id="from-prompt-eq"></p>
+          <form id="from-ask-form" class="answer-row">
+            <input id="from-ask-input" maxlength="2" autocomplete="off" aria-label="Остаток">
+            <button type="submit" class="primary">Проверить</button>
+          </form>
+          <button type="button" id="from-ask-show" class="link">Показать решение</button>
+        </div>
+
+        <div id="from-assemble" hidden>
+          <p class="prompt-title">Сборка записи</p>
+          <p class="prompt-text">Нажимайте на остатки на доске в том порядке, в котором цифры пишутся слева направо.</p>
+          <div class="actions">
+            <button type="button" id="from-check" class="primary">Проверить</button>
+            <button type="button" id="from-reset" class="ghost">Заново</button>
+            <button type="button" id="from-show" class="ghost">Показать</button>
+          </div>
+        </div>
+        <p class="feedback" id="from-feedback" aria-live="polite"></p>
+      </section>
+    </aside>
+  </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

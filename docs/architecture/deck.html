@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Архитектура: системы счисления</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Швейцарская сетка: 12 колонок, поля 120px, один акцентный цвет, всё выровнено по базовой линии 8px */
+:root {
+  --paper: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #0d111c;
+  --muted: #5b6275;
+  --rule: #d8dbe3;
+  --accent: #2340d8;
+  --accent-soft: #e8ecfc;
+  --font-display: "Golos Text", "Segoe UI", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; }
+html, body { background: #e4e6ec; }
+body { font-family: var(--font-display); color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; }
+body.render { padding: 0; gap: 0; background: var(--paper); }
+
+.slide {
+  position: relative; width: 1920px; height: 1080px; overflow: hidden;
+  background: var(--paper); padding: 112px 120px 96px;
+  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 32px;
+  grid-template-rows: auto 1fr; row-gap: 56px;
+}
+.slide > header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; }
+.slide > header h2 { font-size: 64px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; text-wrap: balance; max-width: 1300px; }
+.slide > header .lead { margin-top: 20px; font-size: 26px; color: var(--muted); line-height: 1.4; max-width: 1100px; }
+.chrome { position: absolute; left: 120px; right: 120px; bottom: 44px; display: flex; justify-content: space-between;
+  font: 500 18px var(--font-mono); color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.chrome .page b { color: var(--ink); font-weight: 600; }
+.eyebrow { font: 600 18px var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+sup, sub { font-size: 0.55em; line-height: 0; }
+
+/* ── 1. Обложка ── */
+.cover { grid-template-rows: auto 1fr auto; }
+.cover .eyebrow { grid-column: 1 / -1; }
+.cover h1 { grid-column: 1 / 9; align-self: end; font-size: 128px; line-height: 0.98; font-weight: 700; letter-spacing: -0.035em; text-wrap: balance; }
+.cover .equation { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 40px; padding-top: 48px; border-top: 2px solid var(--ink);
+  font: 400 112px/1 var(--font-mono); letter-spacing: -0.02em; }
+.cover .equation .eq { color: var(--muted); }
+.cover .facts { margin-left: auto; display: grid; grid-template-columns: repeat(2, auto); gap: 16px 56px; align-self: center;
+  font: 400 24px/1.3 var(--font-display); color: var(--muted); }
+.cover .facts b { display: block; font: 600 34px var(--font-mono); color: var(--ink); }
+
+/* ── 2. Слои ── */
+.layers figure { grid-column: 1 / -1; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--font-display); fill: var(--ink); }
+svg .t-mono { font-family: var(--font-mono); }
+svg .t-title { font-size: 30px; font-weight: 600; }
+svg .t-body { font-size: 22px; fill: var(--muted); }
+svg .t-label { font-family: var(--font-mono); font-size: 18px; letter-spacing: 0.08em; fill: var(--muted); }
+svg .t-edge { font-family: var(--font-mono); font-size: 19px; fill: var(--ink); }
+svg .t-accent { fill: var(--accent); }
+svg .box { fill: var(--surface); stroke: var(--rule); stroke-width: 2; }
+svg .box-accent { fill: var(--surface); stroke: var(--accent); stroke-width: 3; }
+svg .chip { fill: var(--accent-soft); stroke: none; }
+svg .edge { stroke: var(--ink); stroke-width: 2; fill: none; }
+svg .edge-accent { stroke: var(--accent); stroke-width: 2; fill: none; }
+svg .dash { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 8 8; fill: none; }
+
+/* ── 3. В десятичную ── */
+.steps { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 56px 1fr; gap: 0 16px; padding: 18px 0; border-top: 1px solid var(--rule); }
+.steps li:last-child { border-bottom: 1px solid var(--rule); }
+.steps li::before { content: counter(s, decimal-leading-zero); font: 600 20px/1.5 var(--font-mono); color: var(--accent); }
+.steps .what { font-size: 26px; font-weight: 600; line-height: 1.3; }
+.steps .how { grid-column: 2; margin-top: 6px; font: 400 20px/1.45 var(--font-mono); color: var(--muted); }
+.steps .how b { color: var(--ink); font-weight: 600; }
+
+.to-decimal .steps { grid-column: 1 / 6; align-self: start; }
+.to-decimal .stage { grid-column: 7 / -1; align-self: start; display: flex; flex-direction: column; gap: 40px; }
+.cards { display: grid; grid-template-columns: 120px repeat(3, 1fr); column-gap: 24px; row-gap: 0; align-items: center; }
+.cards .rowlabel { font: 500 17px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.cards .cell { text-align: center; font: 400 30px var(--font-mono); padding: 14px 0; border-top: 1px solid var(--rule); }
+.cards .rowlabel { padding: 14px 0; border-top: 1px solid var(--rule); align-self: stretch; display: flex; align-items: center; }
+.cards .digit { display: grid; place-items: center; height: 168px; margin-bottom: 20px; border: 2px solid var(--ink); background: var(--surface);
+  font: 600 104px/1 var(--font-mono); }
+.cards .digit.selected { border: 4px solid var(--accent); color: var(--accent); background: var(--accent-soft); }
+.cards .digit small { display: block; font: 400 20px var(--font-mono); color: var(--muted); margin-top: -8px; }
+.cards .hl { color: var(--accent); font-weight: 600; }
+.ask { display: flex; align-items: center; gap: 24px; padding: 24px 28px; background: var(--surface); border-left: 4px solid var(--accent); font-size: 24px; }
+.ask .field { font: 600 30px var(--font-mono); border-bottom: 2px solid var(--ink); padding: 0 20px 2px; }
+.ask .ok { margin-left: auto; font: 500 20px var(--font-mono); color: var(--accent); }
+.total { font: 400 34px var(--font-mono); padding-top: 24px; border-top: 2px solid var(--ink); }
+
+/* ── 4. Из десятичной ── */
+.from-decimal .chain { grid-column: 1 / 7; align-self: start; display: grid; grid-template-columns: auto auto 1fr; column-gap: 40px; position: relative; }
+.chain .div { font: 400 40px/1 var(--font-mono); padding: 30px 0; border-top: 1px solid var(--rule); white-space: nowrap; }
+.chain .lbl { font: 500 18px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 30px 0; border-top: 1px solid var(--rule); align-self: stretch; display: flex; align-items: center; }
+.chain .rem { padding: 18px 0; border-top: 1px solid var(--rule); }
+.chain .rem span { display: inline-grid; place-items: center; width: 68px; height: 68px; border: 3px solid var(--accent); background: var(--accent-soft); color: var(--accent); font: 600 38px var(--font-mono); }
+.chain .order { grid-column: 1 / -1; display: flex; align-items: center; gap: 28px; padding-top: 36px; border-top: 2px solid var(--ink); }
+.chain .order .slots { display: flex; gap: 10px; }
+.chain .order .slots span { display: grid; place-items: center; width: 84px; height: 84px; border: 3px solid var(--ink); background: var(--surface); font: 600 48px var(--font-mono); }
+.chain .order .result { font: 400 40px var(--font-mono); }
+.chain svg.up { position: absolute; right: 0; top: 0; width: 220px; height: 330px; }
+.from-decimal .steps { grid-column: 8 / -1; align-self: start; }
+
+/* ── 5. API и решения ── */
+.api { grid-column: 1 / 8; align-self: start; display: flex; flex-direction: column; gap: 48px; }
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; font: 500 17px var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0 0 14px; border-bottom: 2px solid var(--ink); }
+td { padding: 16px 24px 16px 0; border-bottom: 1px solid var(--rule); font-size: 22px; vertical-align: top; line-height: 1.35; }
+td.m { font: 400 21px var(--font-mono); white-space: nowrap; }
+td.verb { font: 600 18px var(--font-mono); color: var(--accent); width: 80px; }
+.errors td.m:first-child mark { background: var(--accent); color: var(--surface); padding: 0 4px; }
+.decisions { grid-column: 9 / -1; align-self: start; display: flex; flex-direction: column; }
+.decisions div { padding: 24px 0; border-top: 1px solid var(--rule); }
+.decisions div:last-child { border-bottom: 1px solid var(--rule); }
+.decisions h3 { font-size: 26px; font-weight: 600; line-height: 1.25; }
+.decisions p { margin-top: 8px; font-size: 21px; line-height: 1.45; color: var(--muted); }
+.decisions .big { font: 600 72px/1 var(--font-mono); color: var(--accent); letter-spacing: -0.02em; }
+
+@page { size: 1920px 1080px; margin: 0; }
+@media print { html, body { background: var(--paper); } body { padding: 0; gap: 0; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+
+<!-- 1 ─────────────────────────────────────────────── -->
+<section class="slide cover">
+  <p class="eyebrow">Архитектура · ASP.NET Core · .NET 10</p>
+  <h1>Целые числа в&nbsp;системах счисления</h1>
+  <div class="equation">
+    <span>1A3<sub>16</sub></span><span class="eq">=</span><span>419<sub>10</sub></span>
+    <div class="facts">
+      <div><b>2–16</b>основания</div>
+      <div><b>0–4095</b>значения</div>
+      <div><b>3</b>проекта</div>
+      <div><b>59</b>тестов</div>
+    </div>
+  </div>
+  <footer class="chrome"><span>Учебное веб-приложение</span><span class="page"><b>01</b> / 05</span></footer>
+</section>
+
+<!-- 2 ─────────────────────────────────────────────── -->
+<section class="slide layers">
+  <header>
+    <div>
+      <h2>Три слоя. Вся математика — в ядре</h2>
+      <p class="lead">Ядро не знает про HTTP и браузер. Веб-слой только переводит запросы в вызовы ядра, клиент только рисует шаги.</p>
+    </div>
+  </header>
+  <figure>
+    <svg viewBox="0 0 1680 600" role="img" aria-label="Браузер обращается к веб-слою по JSON, веб-слой напрямую вызывает ядро; тесты проверяют ядро и HTTP-контракт">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2340d8"/>
+        </marker>
+      </defs>
+
+      <!-- Браузер -->
+      <rect class="box" x="0" y="0" width="1240" height="120"/>
+      <text class="t-label" x="32" y="40">БРАУЗЕР · wwwroot</text>
+      <text class="t-title" x="32" y="84">index.html · app.js · styles.css</text>
+      <text class="t-body" x="640" y="70">Карточки, шаги, анимация, ввод ответов.</text>
+      <text class="t-body" x="640" y="98">Ничего не вычисляет.</text>
+
+      <!-- Браузер ⇄ Web -->
+      <line class="edge" x1="440" y1="122" x2="440" y2="196" marker-end="url(#arr)" style="color:#0d111c"/>
+      <text class="t-edge" x="458" y="166">fetch · JSON</text>
+      <line class="edge" x1="800" y1="196" x2="800" y2="122" marker-end="url(#arr)" style="color:#0d111c"/>
+      <text class="t-edge" x="818" y="166">200 · 400 {code, message, position}</text>
+
+      <!-- Web -->
+      <rect class="box" x="0" y="200" width="1240" height="120"/>
+      <text class="t-label" x="32" y="240">NUMBERSYSTEMS.WEB · MINIMAL API</text>
+      <text class="t-title" x="32" y="284">ConversionEndpoints</text>
+      <text class="t-body" x="640" y="270">HTTP ⇄ вызов ядра.</text>
+      <text class="t-body" x="640" y="298">Result&lt;T&gt; → 200 или 400.</text>
+
+      <!-- Web → Core -->
+      <line class="edge-accent" x1="440" y1="322" x2="440" y2="396" marker-end="url(#arrA)"/>
+      <text class="t-edge t-accent" x="458" y="366">прямой вызов, без сети</text>
+
+      <!-- Core -->
+      <rect class="box-accent" x="0" y="400" width="1240" height="200"/>
+      <text class="t-label t-accent" x="32" y="440">NUMBERSYSTEMS.CORE · БЕЗ ЗАВИСИМОСТЕЙ ОТ ASP.NET</text>
+      <g class="t-mono">
+        <rect class="chip" x="32" y="464" width="280" height="52"/><text class="t-edge" x="52" y="497">PositionalExpansion</text>
+        <rect class="chip" x="328" y="464" width="220" height="52"/><text class="t-edge" x="348" y="497">DivisionChain</text>
+        <rect class="chip" x="564" y="464" width="220" height="52"/><text class="t-edge" x="584" y="497">AnswerChecker</text>
+        <rect class="chip" x="800" y="464" width="260" height="52"/><text class="t-edge" x="820" y="497">ExerciseGenerator</text>
+        <rect class="chip" x="32" y="530" width="300" height="52"/><text class="t-edge" x="52" y="563">DigitAlphabet · Limits</text>
+        <rect class="chip" x="348" y="530" width="380" height="52"/><text class="t-edge" x="368" y="563">Result&lt;T&gt; · ConversionError</text>
+      </g>
+
+      <!-- Тесты -->
+      <rect class="box" x="1360" y="200" width="320" height="400" style="stroke-dasharray:8 8"/>
+      <text class="t-label" x="1388" y="240">NUMBERSYSTEMS.TESTS</text>
+      <text class="t-title" x="1388" y="290">xUnit · 59</text>
+      <text class="t-body" x="1388" y="336">Домен: 55 тестов,</text>
+      <text class="t-body" x="1388" y="364">включая круговую</text>
+      <text class="t-body" x="1388" y="392">проверку 15 × 4096</text>
+      <text class="t-body" x="1388" y="440">API: 4 теста через</text>
+      <text class="t-body" x="1388" y="468">WebApplicationFactory</text>
+
+      <line class="edge" x1="1358" y1="260" x2="1244" y2="260" marker-end="url(#arr)" style="color:#0d111c"/>
+      <text class="t-edge" x="1301" y="246" text-anchor="middle">HTTP</text>
+      <line class="edge-accent" x1="1358" y1="500" x2="1244" y2="500" marker-end="url(#arrA)"/>
+      <text class="t-edge t-accent" x="1301" y="486" text-anchor="middle">домен</text>
+    </svg>
+  </figure>
+  <footer class="chrome"><span>Слои и зависимости</span><span class="page"><b>02</b> / 05</span></footer>
+</section>
+
+<!-- 3 ─────────────────────────────────────────────── -->
+<section class="slide to-decimal">
+  <header>
+    <div>
+      <p class="eyebrow">Задача 1</p>
+      <h2 style="margin-top:16px">Из системы b в десятичную: разрядное разложение</h2>
+    </div>
+  </header>
+  <ol class="steps">
+    <li><span class="what">Ввод числа и основания</span><span class="how"><b>1A3</b>, b = <b>16</b></span></li>
+    <li><span class="what">Запрос разложения</span><span class="how">GET /api/to-decimal?number=1A3&amp;radix=16</span></li>
+    <li><span class="what">Ядро проверяет цифры и строит разряды</span><span class="how">PositionalExpansion → <b>DigitTerm[]</b><br>цифра · вес · вклад · сумма</span></li>
+    <li><span class="what">Пользователь выбирает карточку и считает вклад</span><span class="how">POST /api/check<br>{ <b>DigitContribution</b>, index: 1, answer: "160" }</span></li>
+    <li><span class="what">Поэтапное суммирование вкладов</span><span class="how">256 → 416 → <b>419</b></span></li>
+  </ol>
+  <div class="stage">
+    <div class="cards">
+      <span></span>
+      <div class="digit">1<small>&nbsp;</small></div>
+      <div class="digit selected">A<small class="accent">= 10</small></div>
+      <div class="digit">3<small>&nbsp;</small></div>
+
+      <span class="rowlabel">Вес</span>
+      <span class="cell">16<sup>2</sup> = 256</span><span class="cell">16<sup>1</sup> = 16</span><span class="cell">16<sup>0</sup> = 1</span>
+      <span class="rowlabel">Вклад</span>
+      <span class="cell">256</span><span class="cell hl">160</span><span class="cell">3</span>
+      <span class="rowlabel">Сумма</span>
+      <span class="cell muted">256</span><span class="cell muted">416</span><span class="cell">419</span>
+    </div>
+    <div class="ask">Вклад разряда 1 (цифра A) = <span class="field">160</span><span class="ok">A · 16¹ = 10 · 16 = 160</span></div>
+    <div class="total">1A3<sub>16</sub> = 1·16<sup>2</sup> + 10·16<sup>1</sup> + 3·16<sup>0</sup> = <b>419</b><sub>10</sub></div>
+  </div>
+  <footer class="chrome"><span>Карточки цифр над разрядными весами</span><span class="page"><b>03</b> / 05</span></footer>
+</section>
+
+<!-- 4 ─────────────────────────────────────────────── -->
+<section class="slide from-decimal">
+  <header>
+    <div>
+      <p class="eyebrow">Задача 2</p>
+      <h2 style="margin-top:16px">Из десятичной в систему b: деление с остатком</h2>
+    </div>
+  </header>
+  <div class="chain">
+    <span class="div">419 : 16 = 26</span><span class="lbl">остаток</span><span class="rem"><span>3</span></span>
+    <span class="div">26 : 16 = 1</span><span class="lbl">остаток</span><span class="rem"><span>A</span></span>
+    <span class="div">1 : 16 = 0</span><span class="lbl">остаток</span><span class="rem"><span>1</span></span>
+    <svg class="up" viewBox="0 0 220 330" aria-hidden="true">
+      <defs>
+        <marker id="arrUp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2340d8"/>
+        </marker>
+      </defs>
+      <line x1="60" y1="290" x2="60" y2="40" stroke="#2340d8" stroke-width="3" marker-end="url(#arrUp)"/>
+      <text class="t-edge t-accent" x="84" y="150">читаем</text>
+      <text class="t-edge t-accent" x="84" y="176">снизу</text>
+      <text class="t-edge t-accent" x="84" y="202">вверх</text>
+    </svg>
+    <div class="order">
+      <div class="slots"><span>1</span><span>A</span><span>3</span></div>
+      <span class="result">419<sub>10</sub> = <b>1A3</b><sub>16</sub></span>
+    </div>
+  </div>
+  <ol class="steps">
+    <li><span class="what">Цепочка делений до частного 0</span><span class="how">GET /api/from-decimal → <b>DivisionStep[]</b><br>do … while (n &gt; 0)</span></li>
+    <li><span class="what">Пользователь находит очередной остаток</span><span class="how">{ <b>NextRemainder</b>, index: 1 }<br>принимается «A» и «10»</span></li>
+    <li><span class="what">Остаток встаёт фишкой рядом с делением</span><span class="how">следующее деление открывается после верного ответа</span></li>
+    <li><span class="what">Сборка записи слева направо</span><span class="how">{ <b>DigitOrder</b>, answer: "1A3" }</span></li>
+    <li><span class="what">Ноль не требует особого кода</span><span class="how">0 = 16 · 0 + <b>0</b> → запись «0»</span></li>
+  </ol>
+  <footer class="chrome"><span>Остатки → запись числа в обратном порядке</span><span class="page"><b>04</b> / 05</span></footer>
+</section>
+
+<!-- 5 ─────────────────────────────────────────────── -->
+<section class="slide">
+  <header>
+    <div>
+      <h2>HTTP API, ошибки ввода и ключевые решения</h2>
+    </div>
+  </header>
+  <div class="api">
+    <table>
+      <thead><tr><th></th><th>Путь</th><th>Ответ</th></tr></thead>
+      <tbody>
+        <tr><td class="verb">GET</td><td class="m">/api/to-decimal</td><td>Разряды: вес, вклад, накопленная сумма</td></tr>
+        <tr><td class="verb">GET</td><td class="m">/api/from-decimal</td><td>Цепочка делений и итоговая запись</td></tr>
+        <tr><td class="verb">POST</td><td class="m">/api/check</td><td>correct · hint · explanation</td></tr>
+        <tr><td class="verb">GET</td><td class="m">/api/exercise</td><td>Случайное число и основание ≠ 10</td></tr>
+      </tbody>
+    </table>
+    <table class="errors">
+      <thead><tr><th>Ввод</th><th>Код ошибки → 400</th></tr></thead>
+      <tbody>
+        <tr><td class="m">1<mark>2</mark>01<sub>2</sub></td><td class="m">InvalidDigit, position: 1</td></tr>
+        <tr><td class="m">-5</td><td class="m">NegativeNumber</td></tr>
+        <tr><td class="m">4096 · 1000<sub>16</sub></td><td class="m">ValueOutOfRange</td></tr>
+        <tr><td class="m">b = 17</td><td class="m">RadixOutOfRange</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="decisions">
+    <div><h3>Алгоритм отдаёт шаги, а не только ответ</h3><p>Клиент рисует DigitTerm и DivisionStep как есть.</p></div>
+    <div><h3>Ошибка — это значение</h3><p>Result&lt;T&gt; с позицией символа: UI подсвечивает неверную цифру.</p></div>
+    <div><h3>Проверка без состояния</h3><p>Условие приходит в запросе, ответ вычисляется заново. Ни сессий, ни базы.</p></div>
+    <div><h3>Один валидатор на обе задачи</h3><p>Десятичный ввод разбирается тем же кодом с основанием 10.</p></div>
+  </div>
+  <footer class="chrome"><span>Контракт и решения</span><span class="page"><b>05</b> / 05</span></footer>
+</section>
+
+<script>
+  // ?slide=N — показать один слайд без полей (для рендера в PNG)
+  const n = Number(new URLSearchParams(location.search).get('slide'));
+  if (n) {
+    document.body.classList.add('render');
+    document.querySelectorAll('.slide').forEach((s, i) => { s.hidden = i + 1 !== n; });
+  }
+</script>
+<style>[hidden]{display:none!important}</style>
+</body>
+</html>

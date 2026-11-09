@@ -89,7 +89,6 @@ src/
 tests/
   NumberSystems.Tests/         xUnit: ядро и API
 docs/
-  ARCHITECTURE.md              подробное описание архитектуры
   architecture/                слайды и схема кнопок
 ```
 
